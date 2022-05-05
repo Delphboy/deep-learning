@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Henry Senior" />
+  <title>Graph Neural Networks</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+   var mathElements = document.getElementsByClassName("math");
+   var macros = [];
+   for (var i = 0; i < mathElements.length; i++) {
+    var texText = mathElements[i].firstChild;
+    if (mathElements[i].tagName == "SPAN") {
+     katex.render(texText.data, mathElements[i], {
+      displayMode: mathElements[i].classList.contains('display'),
+      throwOnError: false,
+      macros: macros,
+      fleqn: false
+     });
+  }}});
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Graph Neural Networks</h1>
+<p class="subtitle">From First Principles</p>
+<p class="author">Henry Senior</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#set-theory">Set Theory</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#equality-and-membership">Equality and Membership</a></li>
+<li><a href="#subsets">Subsets</a></li>
+<li><a href="#set-operations">Set Operations</a>
+<ul>
+<li><a href="#union-cup">Union <span class="math inline">\cup</span></a></li>
+<li><a href="#intersection-cap">Intersection <span class="math inline">\cap</span></a></li>
+<li><a href="#difference-relative-complement--">Difference (Relative Complement) <span class="math inline">-</span></a></li>
+<li><a href="#cartesian-product-times">Cartesian Product <span class="math inline">\times</span></a></li>
+</ul></li>
+<li><a href="#disjoint-and-complement-sets">Disjoint and Complement Sets</a></li>
+</ul></li>
+<li><a href="#references">References</a></li>
+</ul>
+</nav>
+<p>An example reference: In the beginning, there was <span class="citation" data-cites="russell2005ai"><a href="#ref-russell2005ai" role="doc-biblioref">[1]</a></span></p>
+<h1 id="set-theory">Set Theory</h1>
+<h2 id="definitions">Definitions</h2>
+<p>A set is simply a collection of objects where order doesn’t matter.</p>
+<p><span class="math display">
+A := \{1, 2, 3, 4\}
+</span> <span class="math display">
+B := \{4, 2, 3, 1\}
+</span></p>
+<p>As order doesn’t matter, <span class="math inline">A = B</span></p>
+<p>The elements of a set are assumed to be distinct, even if duplicates exist. Therefore:</p>
+<p><span class="math display">
+C := \{1,1,2,3,4\}
+</span> <span class="math display">
+A = C
+</span></p>
+<p>A large set, or an infinite set can be defined with a vertical bar that reads “such that”, followed by a condition</p>
+<p><span class="math display">
+D := \{x | x\text{ is a positive, even integer}\}
+</span></p>
+<p>It is also possible to have a set of sets: <span class="math inline">E = \{ \mathbb{R}, \mathbb{Z} \}</span></p>
+<p>The <strong>cardinality</strong> of a set is denoted <span class="math inline">|A|</span> and gives the number of elements in the set. ie) <span class="math inline">|A| = 4</span> and <span class="math inline">|\mathbb{Z}| = \text{infinity}</span></p>
+<p>An empty set is referred to as the <strong>null</strong> set or the <strong>void</strong> set and is denoted with <span class="math inline">\emptyset</span>, where <span class="math inline">\emptyset = \{\}</span>.</p>
+<p>An ordered set is denoted using <span class="math inline">()</span></p>
+<p><span class="math display">
+P = (a, b)
+</span> <span class="math display">
+Q = (c, d)
+</span> <span class="math display">
+(a, b) \neq (b, a)
+</span> <span class="math display">
+P = Q \text{ iff } a = c \text{ and } b = d
+</span></p>
+<h2 id="equality-and-membership">Equality and Membership</h2>
+<p>If <span class="math inline">x</span> belongs to the set <span class="math inline">X</span> then <span class="math inline">x \in X</span>, else <span class="math inline">x \notin X</span></p>
+<p>For <span class="math inline">X = Y</span> both the following must be true:</p>
+<p>For every <span class="math inline">x</span>, if <span class="math inline">x \in X</span>, then <span class="math inline">x \in Y</span></p>
+<p>AND</p>
+<p>For every <span class="math inline">x</span>, if <span class="math inline">x \in Y</span>, then <span class="math inline">x \in X</span></p>
+<h2 id="subsets">Subsets</h2>
+<p>When a set contains all the elements of a subset in addition to others, the second set is said to be a subset of the first set.</p>
+<p><span class="math display">
+A = \{1, 2, 3, 4\} \\
+B = \{3, 2\} \\
+B \subseteq A
+</span></p>
+<!-- <aside> -->
+<p><strong>Note:</strong> Any set <span class="math inline">X</span> is a subset of itself. The null set is a subset of all sets <!-- </aside> --></p>
+<p>If <span class="math inline">X</span> is a subset of <span class="math inline">Y</span> and <span class="math inline">X \neq Y</span>, then <span class="math inline">X</span> is a proper subset of <span class="math inline">Y</span>, denoted <span class="math inline">X \subset Y</span></p>
+<p>The set of subsets of a set <span class="math inline">X</span>, regardless of whether they are proper or not, is called the <strong>power set</strong> and denoted <span class="math inline">\mathcal{P}(X)</span></p>
+<p><span class="math display">
+A = \{a, b ,c\}
+</span> <span class="math display">
+\mathcal{P}(A) = \emptyset, \{a\}, \{b\}, \{c\}, \{a, b\}, \{a, c\}, \{b, c\}, \{a, b, c\}
+</span></p>
+<p>It is worth noting that in general <span class="math inline">|\mathcal{P}(X)| = 2^{|X|}</span></p>
+<h2 id="set-operations">Set Operations</h2>
+<h3 id="union-cup">Union <span class="math inline">\cup</span></h3>
+<p>The union operator creates a new set consisting of all the elements belonging to either of the sets being joined or elements that belong to both of them.</p>
+<p>Formally: <span class="math inline">X \cup Y = \{x | x \in X \text{   or   } x \in Y\}</span></p>
+<p><span class="math display">
+A = \{1, 3, 4\}
+</span> <span class="math display">
+B = \{2, 5\}
+</span> <span class="math display">
+A \cup B = \{1, 3, 4, 2, 5\}
+</span></p>
+<h3 id="intersection-cap">Intersection <span class="math inline">\cap</span></h3>
+<p>The intersection operator creates a new set containing only the elements that belong to <strong>both</strong> sets.</p>
+<p>Formally: <span class="math inline">X \cap Y = \{x | x\in X \text{ and } x \in Y\}</span></p>
+<p><span class="math display">
+A = \{2, 3\} 
+</span> <span class="math display">
+B = \{1, 2\}
+</span> <span class="math display">
+A \cap B = \{2\}
+</span></p>
+<h3 id="difference-relative-complement--">Difference (Relative Complement) <span class="math inline">-</span></h3>
+<p>The difference operator returns the set of elements that are in the first set but not in the second. Formally: <span class="math inline">X - Y = \{x | x \in X \text{ and } x \notin Y\}</span></p>
+<p><span class="math display">
+A = \{1, 2, 3\}
+</span> <span class="math display">
+B = \{1, 2\} 
+</span> <span class="math display">
+A - B = \{3\}
+</span></p>
+<!-- <aside> -->
+<p><strong>Note:</strong> <span class="math inline">A - B \neq B - A</span> <!-- </aside> --></p>
+<h3 id="cartesian-product-times">Cartesian Product <span class="math inline">\times</span></h3>
+<p>The cartesian product of <span class="math inline">X</span> and <span class="math inline">Y</span> gives the set of all ordered pairs <span class="math inline">(x, y)</span> where</p>
+<p><span class="math inline">x\in X \text{ and } y \in Y</span></p>
+<p><span class="math display">
+X = \{1, 2, 3\}
+</span> <span class="math display">
+Y = \{a, b\}
+</span> <span class="math display">
+X \times Y = \{(1, a), (1, b), (2, a), (2, b), (3, a), (3, b)\}
+</span> <span class="math display">
+Y \times X = \{(a, 1), (b, 1), (a, 2), (b, 2), (a, 3), (b, 3)\}
+</span> <span class="math display">
+X \times Y \neq Y \times X
+</span></p>
+<!-- <aside> -->
+<p><strong>Note:</strong> <span class="math inline">|X \times Y| = |X| \cdot |Y|</span></p>
+<!-- </aside> -->
+<h2 id="disjoint-and-complement-sets">Disjoint and Complement Sets</h2>
+<p>A pair of sets are said to be <strong>disjoint</strong> if no elements belong to both sets, in other words:</p>
+<p><span class="math inline">X \cap Y = \empty</span></p>
+<p>Given a set of sets <span class="math inline">\mathcal{S}</span>, it is said to be <strong>pairwise disjoint</strong> if given two distinct sets <span class="math inline">X</span> and <span class="math inline">Y</span>, then <span class="math inline">X \cap Y = \empty</span>. ie) <span class="math inline">\mathcal{S} = \{\{1, 4, 5\}, \{2,6\}, \{3\}\}</span> is pairwise disjoint.</p>
+<p>If working with sets that are all a subset of some larger set, <span class="math inline">U</span>, this larger set is referred to as the <strong>universal set</strong>. It must be explicitly given or inferred through context.</p>
+<p>If <span class="math inline">X \subset U</span>, the <strong>complement</strong> of <span class="math inline">X</span> is given as <span class="math inline">\bar X = U - X</span></p>
+<h1 class="unnumbered" id="references">References</h1>
+<div id="refs" class="references csl-bib-body" role="doc-bibliography">
+<div id="ref-russell2005ai" class="csl-entry" role="doc-biblioentry">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">S. Russell and P. Norvig, <span>“AI a modern approach,”</span> <em>Learning</em>, vol. 2, no. 3, p. 4, 2005.</div>
+</div>
+</div>
+</body>
+</html>
